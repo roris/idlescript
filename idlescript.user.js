@@ -25,7 +25,7 @@
 
 	function send_msg(msg)
 	{	
-		doc [ 'gikopoi' ].JSCallBackSendMessage(msg);
+		doc['gikopoi'].JSCallBackSendMessage(msg);
 	}
 
 	function do_keep_alive()
