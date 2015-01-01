@@ -25,7 +25,7 @@
 
 	function send_msg(msg)
 	{	
-		location.assign("javascript: DocumentGetElementFromName('gikopoi').JSCallBackSendMessage('" + msg + "'); void(0)");
+		doc [ 'gikopoi' ].JSCallBackSendMessage(msg);
 	}
 
 	function do_keep_alive()
