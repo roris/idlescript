@@ -30,9 +30,9 @@
 
 	function do_keep_alive()
 	{
-		var delta = Math.floor((Date.now() / 1000) - is.time);
-		var deltas = 60 - Math.floor(delta % 60)
-		var deltam = 25 - Math.floor(delta / 60);
+		var delta = Date.now() / 1000) - is.time;
+		var deltas = Math.floor(60 - (delta % 60));
+		var deltam = Math.floor(25 - (delta / 60));
 
 		if(delta >= 1500) {
 			send_msg(is.lb_afk.textContent);
