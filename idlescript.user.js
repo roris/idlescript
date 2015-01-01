@@ -34,7 +34,7 @@
 		var deltas = 60 - Math.floor(delta % 60)
 		var deltam = 25 - Math.floor(delta / 60);
 
-		if(delta => 1500) {
+		if(delta >= 1500) {
 			send_msg(is.lb_afk.textContent);
 			is.clock.style.color = "black";
 			is.time = Date.now() / 1000;
