@@ -30,7 +30,7 @@
 
 	function do_keep_alive()
 	{
-		var delta = Date.now() / 1000) - is.time;
+		var delta = (Date.now() / 1000) - is.time;
 		var deltas = Math.floor(60 - (delta % 60));
 		var deltam = Math.floor(25 - (delta / 60));
 
