@@ -18,7 +18,7 @@
 		interval: 0,
 		afk: false,
 		idle: true,
-		time: Date.now() / 1000,
+		time: 0,
 		clock: doc.createElement("div"),
 		lb_afk: doc.createElement("div")
 	};
@@ -49,6 +49,7 @@
 
 	function start_keep_alive()
 	{
+		is.time = Date.now() / 1000;
 		do_keep_alive();
 		is.interval = setInterval(do_keep_alive, 1000);
 		is.idle = true;
@@ -85,7 +86,6 @@
 					is.idle = false;
 					is.clock.textContent = "";
 				} else {
-					is.time = Date.now() / 1000;
 					start_keep_alive();
 				}
 				break;
@@ -94,7 +94,6 @@
 				break;
 			case 82:
 				send_msg("#rula");
-				break;
 			}
 		}
 	};
