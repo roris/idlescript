@@ -2,9 +2,8 @@
 // @name        idlescript
 // @namespace   idlescript
 // @description pls don't time out
-// @include     http://l4cs.jpn.org/gikopoi/flash/gikopoi134_gen/flash_gikopoi.html
-// @include     http://l4cs.jpn.org/gikopoi/flash/gikopoi134_for/flash_gikopoi.html
-// @version     1
+// @include	http://l4cs.jpn.org/gikopoi/flash/gikopoi*/flash_gikopoi.html
+// @version     1.01
 // @grant       none
 // ==/UserScript==
 
@@ -16,9 +15,8 @@
 (function (doc, win) { 
 	var is = {
 		interval: 0,
-		afk: false,
 		idle: true,
-		time: 0,
+		time: Date.now() / 1000,
 		clock: doc.createElement("div"),
 		lb_afk: doc.createElement("div")
 	};
@@ -47,14 +45,60 @@
 		is.clock.textContent = "" + (deltam < 10 ? "0" + deltam : deltam) + ":" + (deltas < 10 ? "0" + deltas : deltas);
 	}
 
-	function start_keep_alive()
+	function start_idle()
 	{
 		is.time = Date.now() / 1000;
 		do_keep_alive();
 		is.interval = setInterval(do_keep_alive, 1000);
 		is.idle = true;
 	}
-  
+
+	function check_mode(text)
+	{
+		if (is.lb_afk.textContent == text) {
+			is.lb_afk.textContent = "";
+		} else {
+			is.lb_afk.textContent = text;
+			if (is.idle) {
+				is.time = Date.now() / 1000;
+				do_keep_alive();
+			} else {
+				start_idle();
+			}
+		}
+	}
+
+	win.onkeyup = function(e)
+	{
+		if(e.altKey && e.shiftKey) {
+			switch(e.keyCode) {
+			case 65:
+				check_mode("afk");
+				break;
+			case 73:
+				if(is.idle) {
+					clearInterval(is.interval);
+					is.idle = false;
+					is.clock.textContent = "";
+				} else {
+					start_idle();
+				}
+				break;
+			case 76:
+				send_msg("#list");
+				break;
+			case 82:
+				send_msg("#rula");
+				break;
+			case 50:
+				check_mode("=@=");
+				break;
+			case 80:
+				check_mode("PLAY ON!");
+			}
+		}
+	};
+
 	is.clock.style.color = "black";
 	is.clock.style.position = "absolute";
 	is.clock.style.top = 0;
@@ -71,33 +115,6 @@
 	doc.body.appendChild(is.clock);
 	doc.body.appendChild(is.lb_afk);
 
-	win.onkeyup = function(e)
-	{
-		if(e.altKey && e.shiftKey) {
-			switch(e.keyCode) {
-			case 65:
-				is.lb_afk.textContent = is.afk ? "" : "afk";
-				is.afk = !is.afk;
-				send_msg(is.lb_afk.textContent);
-				break;
-			case 73:
-				if(is.idle) {
-					clearInterval(is.invertval);
-					is.idle = false;
-					is.clock.textContent = "";
-				} else {
-					start_keep_alive();
-				}
-				break;
-			case 76:
-				send_msg("#list");
-				break;
-			case 82:
-				send_msg("#rula");
-			}
-		}
-	};
-
-	start_keep_alive();
+	start_idle();
   
 })(document, window);
