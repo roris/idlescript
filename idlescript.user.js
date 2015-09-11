@@ -103,13 +103,13 @@
 	};
 
 	is.clock.style.color = "black";
-	is.clock.style.position = "absolute";
+	is.clock.style.position = "fixed";
 	is.clock.style.top = 0;
 	is.clock.style.right = 0;
 	is.clock.style.fontSize = "24px";
 	is.clock.style.fontWeight = 4;
 
-	is.lb_afk.style.position = "absolute";
+	is.lb_afk.style.position = "fixed";
 	is.lb_afk.style.top = "24px";
 	is.lb_afk.style.right = 0;
 	is.lb_afk.style.fontSize = "24px";
