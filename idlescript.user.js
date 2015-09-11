@@ -95,7 +95,10 @@
 				break;
 			case 80:
 				check_mode("PLAY ON!");
+			default:
+					return;
 			}
+			send_msg(is.lb_afk.textContent);
 		}
 	};
 
