@@ -11,6 +11,8 @@
 // ALT+SHIFT+L: #list
 // ALT+SHIFT+R: #rula
 (function (doc, win) {
+  // the keep alive interval in seconds
+  var ka_interval = 1500;
   var is = {
     interval: 0,
     idle: true,
@@ -33,13 +35,13 @@
     var deltas = Math.floor(delta % 60);
     var deltam = Math.floor(25 - (delta / 60));
     deltas = deltas == 0 ? 0 : 60 - deltas;
-    if (delta >= 1500) {
+    if (delta >= ka_invterval) {
       send_msg(is.lb_afk.textContent);
       is.clock.style.color = 'black';
       is.time = Date.now() / 1000;
       deltas = 0;
       deltam = 25;
-    } else if (delta > 1490) {
+    } else if (delta > ka_interval - 10) {
       is.clock.style.color = 'red';
     }
     is.clock.textContent = '' + (deltam < 10 ? '0' + deltam : deltam) + ':' + (deltas < 10 ? '0' + deltas : deltas);
