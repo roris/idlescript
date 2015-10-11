@@ -3,7 +3,7 @@
 // @namespace   idlescript
 // @description Prevent Gikopoi timeouts.
 // @include     http://l4cs.jpn.org/gikopoi/flash/gikopoi*/flash_gikopoi.html
-// @version     1.05
+// @version     1.05.01
 // @grant       none
 // @updateURL   https://github.com/roris/idlescript/raw/master/idlescript.user.js
 // ==/UserScript==
@@ -73,6 +73,7 @@
   divPanel.style.top = 0;
   divPanel.style.right = 0;
   txtAfk.style.top = 48;
+  txtAfk.style.right = 0;
   txtAfk.style.position = 'fixed';
   divPanel.appendChild(btnAfk);
   divPanel.appendChild(btnRula);
