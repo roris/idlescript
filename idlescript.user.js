@@ -1,149 +1,84 @@
 // ==UserScript==
 // @name        idlescript
 // @namespace   idlescript
-// @description pls don't time out
-// @include	http://l4cs.jpn.org/gikopoi/flash/gikopoi*/flash_gikopoi.html
-// @version     1.02
+// @description Prevent Gikopoi timeouts.
+// @include     http://l4cs.jpn.org/gikopoi/flash/gikopoi*/flash_gikopoi.html
+// @version     1.05
 // @grant       none
+// @updateURL   https://github.com/roris/idlescript/raw/master/idlescript.user.js
 // ==/UserScript==
-// ALT+SHIFT+A: toggle afk
-// ALT+SHIFT+I: toggle idle
-// ALT+SHIFT+L: #list
-// ALT+SHIFT+R: #rula
 (function (doc, win) {
-  // the keep alive interval in seconds
-  var ka_interval = 1500;
-  var is = {
-    interval: 0,
-    idle: true,
-    time: Date.now() / 1000,
-    btn_afk: doc.createElement('button'),
-    btn_rula: doc.createElement('button'),
-    btn_list: doc.createElement('button'),
-    btn_ka: doc.createElement('button'),
-    clock: doc.createElement('div'),
-    lb_afk: doc.createElement('div'),
-    panel: doc.createElement('div')
+  function now() {
+    return new Date().getTime() / 1000;
+  }
+  var keepAliveInterval = 1500; // keep alive interval in seconds
+  var intervalFn = undefined;
+  var afk = false;
+  var prevTime = now();
+  var btnAfk = doc.createElement('button');
+  var btnRula = doc.createElement('button');
+  var btnList = doc.createElement('button');
+  var divTimer = doc.createElement('div');
+  var divPanel = doc.createElement('div');
+  var txtAfk = doc.createElement('textarea');
+  function sendMessage(m) {
+    doc['gikopoi'].JSCallBackSendMessage(m);
+  }
+  function zeroPad(n) {
+    return '' + n < 10 ? '0' + n : n;
+  }
+  function sendKeepAlive() {
+    var tDelta = now() - prevTime;
+    var deltaS = Math.floor(tDelta % 60);
+    var deltaM = Math.floor(25 - (tDelta / 60));
+    deltaS = deltaS == 0 ? 0 : 60 - deltaS;
+    if (tDelta >= keepAliveInterval) {
+      sendMessage(afk ? textAfk.content : '');
+      divTimer.style.color = 'black';
+      prevTime = now();
+      deltaS = 0;
+      deltaM = 1500 / 60;
+    } else if (tDelta > keepAliveInterval - 10) {
+      divTimer.style.color = 'red';
+    }
+    divTimer.textContent = zeroPad(deltaM) + ':' + zeroPad(deltaS);
+  }
+  function startKeepAlive() {
+    prevTime = now();
+    sendKeepAlive();
+    intervalFn = setInterval(sendKeepAlive, 1000);
+  }
+  btnRula.textContent = 'Rula';
+  btnRula.onclick = function () {
+    sendMessage('#rula');
   };
-  function send_msg(msg)
-  {
-    doc['gikopoi'].JSCallBackSendMessage(msg);
-  }
-  function do_keep_alive()
-  {
-    var delta = (Date.now() / 1000) - is.time;
-    var deltas = Math.floor(delta % 60);
-    var deltam = Math.floor(25 - (delta / 60));
-    deltas = deltas == 0 ? 0 : 60 - deltas;
-    if (delta >= ka_invterval) {
-      send_msg(is.lb_afk.textContent);
-      is.clock.style.color = 'black';
-      is.time = Date.now() / 1000;
-      deltas = 0;
-      deltam = 25;
-    } else if (delta > ka_interval - 10) {
-      is.clock.style.color = 'red';
-    }
-    is.clock.textContent = '' + (deltam < 10 ? '0' + deltam : deltam) + ':' + (deltas < 10 ? '0' + deltas : deltas);
-  }
-  function color_buttons() {
-    switch (is.lb_afk.textContent) {
-      case 'afk':
-        is.btn_afk.style.color = 'red';
-        is.btn_ka.style.color = '';
-        break;
-      default:
-        is.btn_afk.style.color = '';
-        break;
-    }
-  }
-  function start_idle()
-  {
-    is.time = Date.now() / 1000;
-    do_keep_alive();
-    is.interval = setInterval(do_keep_alive, 1000);
-    is.idle = true;
-  }
-  function check_mode(text)
-  {
-    if (is.lb_afk.textContent == text) {
-      is.lb_afk.textContent = '';
-    } else {
-      is.lb_afk.textContent = text;
-      if (is.idle) {
-        is.time = Date.now() / 1000;
-        do_keep_alive();
-      } else {
-        start_idle();
-      }
-    }
-    color_buttons();
-  }
-  function check_keep_alive() {
-    if (is.idle) {
-      clearInterval(is.interval);
-      is.idle = false;
-      is.clock.textContent = '';
-      is.btn_ka.style.color = '';
-    } else {
-      start_idle();
-      color_buttons();
-      is.btn_ka.style.color = 'red';
-    }
-  }
-  win.onkeyup = function (e)
-  {
-    if (e.altKey && e.shiftKey) {
-      switch (e.keyCode) {
-        case 65:
-          check_mode('afk');
-          break;
-        case 73:
-          check_keep_alive();
-          break;
-        case 76:
-          send_msg('#list');
-          break;
-        case 82:
-          send_msg('#rula');
-          break;
-        default:
-          return;
-      }
-      send_msg(is.lb_afk.textContent);
+  btnList.textContent = 'List';
+  btnList.onclick = function () {
+    sendMessage('#list');
+  };
+  btnAfk.textContent = 'AFK';
+  btnAfk.onclick = function () {
+    afk = !afk;
+    btnAfk.style.color = afk ? 'red' : 'black';
+    if (afk) {
+      clearInterval(intervalFn);
+      startKeepAlive();
     }
   };
-  is.btn_afk.textContent = 'AFK';
-  is.btn_afk.onclick = function () {
-    check_mode('afk');
-    send_msg(is.lb_afk.textContent);
-  };
-  is.btn_rula.textContent = 'Rula';
-  is.btn_rula.onclick = function () {
-    send_msg('#rula');
-  };
-  is.btn_list.textContent = 'List';
-  is.btn_list.onclick = function () {
-    send_msg('#list');
-  };
-  is.btn_ka.textContent = 'Keep Alive';
-  is.btn_ka.onclick = function () {
-    check_keep_alive();
-  }
-  is.clock.style.color = 'black';
-  is.clock.style.position = 'absolute';
-  is.clock.style.right = 0;
-  is.clock.style.fontSize = '24px';
-  is.panel.style.position = 'fixed';
-  is.panel.style.top = 0;
-  is.panel.style.right = 0;
-  is.panel.appendChild(is.btn_ka);
-  is.panel.appendChild(is.btn_afk);
-  is.panel.appendChild(is.btn_rula);
-  is.panel.appendChild(is.btn_list);
-  is.panel.appendChild(is.clock);
-  doc.body.appendChild(is.panel);
-  start_idle();
-  color_buttons();
-  is.btn_ka.style.color = 'red';
+  divTimer.style.color = 'black';
+  divTimer.style.position = 'absolute';
+  divTimer.style.right = 0;
+  divTimer.style.fontSize = '24px';
+  divPanel.style.position = 'fixed';
+  divPanel.style.top = 0;
+  divPanel.style.right = 0;
+  txtAfk.style.top = 48;
+  txtAfk.style.position = 'fixed';
+  divPanel.appendChild(btnAfk);
+  divPanel.appendChild(btnRula);
+  divPanel.appendChild(btnList);
+  divPanel.appendChild(divTimer);
+  divPanel.appendChild(txtAfk);
+  doc.body.appendChild(divPanel);
+  startKeepAlive();
 }) (document, window);
