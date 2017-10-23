@@ -7,6 +7,12 @@
 // @grant       none
 // @updateURL   https://github.com/roris/idlescript/raw/master/idlescript.user.js
 // ==/UserScript==
+
+// Copyright © 2017 roris
+// This work is free. You can redistribute it and/or modify it under the
+// terms of the Do What The Fuck You Want To Public License, Version 2,
+// as published by Sam Hocevar. See http://www.wtfpl.net/ for more details.
+
 (function (doc, win) {
   function now() {
     return new Date().getTime() / 1000;
